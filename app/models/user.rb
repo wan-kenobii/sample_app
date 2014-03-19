@@ -1,5 +1,9 @@
 class User < ActiveRecord::Base
-  
+  # the option dependent: :destroy in
+  # arranges for the dependent microposts (i.e., the ones belonging to the given user) 
+  # to be destroyed when the user itself is destroyed.
+  has_many :microposts, dependent: :destroy
+
   before_save { self.email = email.downcase }
   
   validates :name, presence: true, length: { maximum: 50 }
@@ -17,6 +21,11 @@ class User < ActiveRecord::Base
     Digest::SHA1.hexdigest(token.to_s)
   end
 
+  def feed
+    # This is preliminary. See "Following users" for the full implementation.
+    Micropost.where("user_id = ?", id)
+  end
+  
   private
 
     def create_remember_token
